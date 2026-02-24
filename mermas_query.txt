@@ -1,0 +1,508 @@
+Basado en las fuentes 
+proporcionadas, el 
+control de mermas 
+(shrinkage control) en 
+la coctelería se aborda 
+desde la estandarización
+operativa, la medición 
+precisa y las técnicas 
+de aprovechamiento para 
+reducir el desperdicio. 
+
+A continuación, se 
+detallan las 
+directrices, elementos a
+medir, mejores prácticas
+y los campos 
+recomendados para los 
+reportes:
+
+### Elementos a Medir en
+el Control de Mermas
+Para tener un control 
+exhaustivo, es 
+fundamental rastrear el 
+origen de la pérdida de 
+líquido o ingredientes. 
+En la operativa diaria 
+de una barra, las mermas
+generalmente se 
+categorizan (y deben 
+medirse) en:
+*   **Invitaciones 
+(Comps):** Bebidas dadas
+como cortesía a clientes
+[1].
+*   **Errores:** 
+Equivocaciones en la 
+preparación de la 
+comanda [1].
+*   **Roturas:** 
+Accidentes que 
+involucren botellas, 
+envases o cristalería 
+con producto [1].
+*   **Caducidad y 
+Deterioro (Spoilage):** 
+Ingredientes 
+perecederos, como jugos 
+frescos o hierbas, que 
+se degradan con el 
+tiempo o lotes 
+pre-mezclados que no se 
+vendieron y superaron su
+vida útil [2-4].
+*   **Sobredosificación 
+(Over-pouring):** Servir
+más alcohol del que 
+dicta la receta [5].
+
+### Mejores Prácticas y 
+Directrices
+**1. Eliminación del 
+"Free-Pouring" (Vertido 
+Libre)**
+Se desaconseja 
+totalmente el 
+*free-pouring* si se 
+busca precisión y 
+control de costos. Las 
+prácticas de medición 
+deben basarse en el 
+volumen utilizando un 
+*jigger* o cilindros 
+graduados. Esto 
+garantiza consistencia 
+en cada trago, evita la 
+sobredosificación y 
+asegura una presentación
+uniforme [6-10].
+
+**2. Técnicas de 
+Pre-Batching 
+(Pre-mezclado)**
+Realizar pre-mezclas 
+(parciales o totales) 
+permite a los gerentes 
+de barra gestionar mejor
+el uso de ingredientes y
+medir cantidades grandes
+con precisión, lo cual 
+minimiza el desperdicio 
+comparado con medir 
+ingrediente por 
+ingrediente durante un 
+servicio ajetreado [5, 
+6, 11]. 
+
+**3. Clarificación de 
+Cócteles**
+Técnicas como el *Milk 
+Punch* (lavado con 
+leche) o la 
+clarificación con 
+agar-agar no solo 
+mejoran la estética y 
+textura, sino que 
+eliminan las partículas 
+y pulpa que aceleran el 
+deterioro. Esto prolonga
+drásticamente la vida 
+útil del cóctel (de días
+a semanas o meses), 
+reduciendo 
+significativamente las 
+mermas por caducidad [4,
+12-14].
+
+**4. Aprovechamiento 
+"Zero-Waste" y 
+Upcycling**
+*   **Cítricos y Super 
+Juice:** En lugar de 
+exprimir los cítricos y 
+tirar las cáscaras 
+(desperdiciando un alto 
+porcentaje de la fruta),
+se deben extraer los 
+aceites esenciales de 
+las pieles mediante 
+ácidos (cítrico y 
+málico) para crear 
+*Super Juice*. Esto 
+aumenta el rendimiento 
+de un solo cítrico hasta
+en un 800% y alarga su 
+vida útil a dos semanas 
+[15-17].
+*   **Reutilización de 
+mermas:** El vino 
+oxidado puede 
+transformarse en siropes
+o vinagres [18]. Las 
+frutas muy maduras o las
+cáscaras sobrantes 
+pueden fermentarse para 
+crear tepache, sodas, o 
+deshidratarse para 
+usarse como polvo o 
+guarniciones comestibles
+[17, 19, 20].
+
+**5. Uso de Tecnología 
+para Inventarios**
+Aprovechar aplicaciones 
+y software de control de
+inventario (como *Spec*)
+que ayuden a costear 
+recetas, registrar los 
+productos con exactitud 
+y hacer recuentos de 
+existencias de forma 
+rápida y precisa para 
+prevenir faltantes y 
+reducir pérdidas [21, 
+22].
+
+### Campos para el 
+Reporte Diario de Mermas
+De acuerdo con las guías
+operativas de barras de 
+alto rendimiento (como 
+el estándar de cierre 
+técnico) y los 
+protocolos de control de
+registros (HACCP), un 
+"Registro de Mermas" 
+(Shrinkage Log) o 
+reporte diario debe 
+incluir anotaciones 
+precisas con los 
+siguientes campos [1, 
+23, 24]:
+
+1.  **Fecha y Hora:** 
+Cuándo ocurrió el 
+incidente o se registró 
+la merma [23, 24].
+2.  **Producto / 
+Ingrediente:** Nombre 
+exacto del líquido, 
+cóctel o insumo afectado
+[24].
+3.  **Cantidad / 
+Volumen:** La cantidad 
+exacta de producto 
+implicado en la pérdida 
+[23].
+4.  **Motivo / Categoría
+de la Merma:** 
+Especificar claramente 
+la causa, eligiendo 
+entre opciones como 
+*Error de preparación*, 
+*Invitación (Cortesía)*,
+*Rotura*, o 
+*Caducidad/Deterioro* 
+[1].
+5.  **Disposición del 
+Producto:** Qué se hizo 
+con el producto (ej. 
+"Desechado", 
+"Rework/Reaprovechado") 
+[23, 24].
+6.  **Persona 
+Responsable:** Firma o 
+iniciales del bartender 
+a cargo y, en su caso, 
+verificación del gerente
+en turno [23, 24].
+
+Sources:
+  [1] 11 Tips for 
+Sustainable Cocktails | 
+Zero-waste Bartending 
+Made ...
+  [2] 5 Top Bartending 
+Techniques from 
+Netflix's Drink Masters 
+| Alcohol Professor
+  [3] 5 ways to smoke 
+your cocktails - DRiNK 
+Magazine Asia
+  [4] A Bar Manager's 
+Guide To Pre-Batched 
+Cocktails
+  [5] A Bartender's 
+Guide to Pre-Batched 
+Cocktails - Toast POS
+  [6] A Guide to 
+Fat-Washing Cocktails 
+With Butter, Bacon Fat, 
+Coconut Oil, and More
+  [7] A guide to 
+carbonation - CLASS - 
+Class Magazine
+  [8] A guide to the 
+sous vide - CLASS
+  [9] AFDO: HACCP Guide 
+- Association of Food 
+and Drug Officials
+  [10] Agar 
+Clarification - 
+ChefSteps Community
+  [11] Agar 
+Clarification Made 
+Stupid-Simple: Best 
+Technique Yet - Cooking 
+Issues
+  [12] Agar agar 
+clarification : 
+r/Mixology - Reddit
+  [13] Agar-Agar 
+Clarification - The 
+Opinionated Alchemist
+  [14] Alcohol-based 
+Foams/Airs : r/cocktails
+- Reddit
+  [15] Can A Cocktail 
+Truly Be Sustainable? - 
+Campari Academy
+  [16] Carbonated 
+Cocktails on Tap - Why 
+So Difficult? | Perlage 
+Systems
+  [17] Carbonation Rig. 
+- The Cocktail Balance
+  [18] Checklists 
+Operativas FENÓMENO.pdf
+  [19] Clarified 
+Cocktails - European 
+Bartender School
+  [20] Clarified 
+Cocktails: A Bar 
+Manager's Guide to 
+Standing Out and 
+Boosting Margins — Spec
+  [21] Clear Intentions 
+- Explaining The Art Of 
+Cocktail Clarification 
+With Neil Alexander
+  [22] Dave Arnold: 
+Rapid Infusion Technique
+(Non-Alcoholic)
+  [23] Discover Fat 
+Washing - Diageo Bar 
+Academy
+  [24] EL LENGUAJE DE 
+LOS FENOMENOS 
+FINAL.pdf-2.pdf
+  [25] Eight techniques 
+for your bar - Difford's
+Guide
+  [26] Elevate Your 
+Beverage Program: The 
+Art of Fat-Washing 
+Cocktails - Amaro & Ink
+  [27] Episode 266 - The
+Modern Bar Cart Podcast
+  [28] Esencia - Sips 
+Barcelona
+  [29] Fat Washing 101: 
+How To Fat Wash Alcohol 
+for Cocktails - 88 
+Bamboo
+  [30] Fat-Wash Your 
+Whisky for a Richer 
+Cocktail
+  [31] Flavouring with 
+Rapid Infusion » How it 
+works - iSi Culinary
+  [32] Foams vs Airs 
+Part I - Diageo Bar 
+Academy
+  [33] Guide to cocktail
+clarification through 
+Milk Punch (check 
+comments) - Reddit
+  [34] HACCP Principles 
+& Application Guidelines
+- FDA
+  [35] How to Build Your
+Own Carbonation Rig - 
+Jeffrey Morgenthaler
+  [36] How to Clarify an
+Ingredient with Agar 
+Agar (Beginner-Friendly 
+Guide) - The Double 
+Strainer
+  [37] How to Make Sous 
+Vide Alcohol Infusions 
+Recipes and Master Guide
+  [38] Impact of Calcium
+Lactate Concentration 
+and Holding Time on 
+Caviar-like Chicken 
+Broth Hydrogel Beads - 
+PMC - NIH
+  [39] Large-Format 
+Cocktail and Batch Prep 
+Checklist for Bars - 
+Provi
+  [40] Liquid 
+Intelligence - Bookey
+  [41] Liquid 
+Intelligence: The Art 
+and Science of the 
+Perfect Cocktail - Just 
+Another Beverage Blog
+  [42] Liquid 
+intelligence by Dave 
+Arnold Rate this book?? 
+: r/bartenders - Reddit
+  [43] MOLECULAR 
+COCKTAILS: 
+SPHERIFICATION
+  [44] Mastering 
+Clarified Milk Punches 
+with Darren Leaney - 
+Difford's Guide
+  [45] Mastering the Art
+of Pressure: Achieving 
+Optimal Dispensing and 
+Carbon - Camp Keg
+  [46] Menu of the 
+month: Mysteries of the 
+World by Paradiso - 
+Drinks International - 
+The global choice for 
+drinks buyers
+  [47] Milk-Washing 
+Magic: A Creamy Journey 
+into Smooth Cocktail 
+Crafting - Subterra 
+Osaka
+  [48] Mitigating Food 
+Waste with Creative 
+Cooking - Shelburne 
+Farms
+  [49] Molecular 
+Mixology: Pushing the 
+Boundaries of Cocktail 
+Craft - Chilled Magazine
+  [50] Molecular 
+Mixology: The Simplest 
+Way to Start - Beaumont 
+TM
+  [51] Molecular 
+Mixology: Unleashing the
+Science of Cocktails - 
+William Fox
+  [52] New York's 
+Existing Conditions bar 
+serves highly scientific
+cocktails - Globetrender
+  [53] Rapid Infusion 
+with the ISI Whip - 
+Molecular Recipes
+  [54] Reverse 
+Spherification - 
+Pennsylvania College of 
+Technology
+  [55] Sips - Barcelona 
+- Bar - 50Best Discovery
+- The World's 50 Best 
+Restaurants
+  [56] Sips Esencia: The
+World's First Liquid 
+Tasting Menu - Honest 
+Cooking
+  [57] Smoke in 
+cocktails - Reddit
+  [58] Smoked Cocktails:
+Why and How to Make Them
+- ReserveBar
+  [59] Smoking - 
+Mixology Techniques - 
+Gem Scientific
+  [60] Smoking Cocktails
+- Diageo Bar Academy
+  [61] Soy Lecithin Foam
+Recipe | Modernist 
+Cooking - Cape Crystal 
+Brands
+  [62] Spherification 
+(Direct Method) : 9 
+Steps (with Pictures) - 
+Instructables
+  [63] Spherification 
+Troubleshooting - 
+Kitchen Alchemy - 
+Modernist Pantry
+  [64] Stabilising a 
+foam. : r/foodscience - 
+Reddit
+  [65] Sustainable 
+Bartending: Innovative 
+Practices for a Greener 
+Bar Scene
+  [66] Sustainable 
+Mixology: Embracing 
+Eco-Friendly Practices 
+in Bartending - Tobago 
+Hospitality & Tourism 
+Institute
+  [67] Technical 
+Foundations of Modern 
+Global Mixology: A 
+Comprehensive Treatise 
+on Avant-Garde Bar 
+Methodologies
+  [68] The Art and 
+Science of the Perfect 
+Cocktail Foam - Tales of
+the Cocktail Foundation
+  [69] The Art of 
+Cocktail Clarification 
+in Modern Mixology - 
+Sidewinder Spirits Co
+  [70] The Basics of Fat
+Washing Bourbon - 
+Redwood Empire Whiskey
+  [71] The Better, 
+Faster Way to Make 
+Syrups and Infusions - 
+Tales of the Cocktail 
+Foundation
+  [72] Turning Waste 
+into Taste: Effective 
+Upcycling of By-Products
+for Innovative Food 
+Solutions§ - PMC
+  [73] Understanding 
+HACCP Principle 3: 
+Establish Critical 
+Limits - SGS
+  [74] Using Sous-Vide 
+For Cocktails | Alcohol 
+Professor
+  [75] Using chemistry 
+and a 300-year-old 
+technique to reinvent a 
+drink
+  [76] What is Fat 
+Washing? Process, Uses &
+Cocktail Tips - FHA-Food
+& Beverage
+  [77] mysteries of the 
+world - Paradiso
+  [78] “Secrets of 
+molecular gastronomy” 
+experiment | MEL 
+Chemistry
+
+Conversation ID: 
+6d7a2ee6-61ae-4244-b8c5-
+531f8bd423e2
+Use --conversation-id 
+for follow-up questions
