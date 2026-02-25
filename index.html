@@ -155,7 +155,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = "fenomeno-ops-v8"; // Full Reseed for missing checklists
+        const appId = "fenomeno-ops-v10"; // Bump to v10 to re-seed configs and inventories
 
         window.FB = {
             db, auth, collection, doc, setDoc, addDoc, onSnapshot, updateDoc, deleteDoc, query, getDocs,
@@ -180,6 +180,7 @@
             const [submissions, setSubmissions] = useState([]);
             const [loading, setLoading] = useState(true);
             const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+            const [userActiveTab, setUserActiveTab] = useState('resumen');
 
             useEffect(() => {
                 const checkFB = setInterval(() => {
@@ -215,7 +216,7 @@
             }, []);
 
             const seedFenomenoData = async () => {
-                const { db, collection, addDoc, appId } = window.FB;
+                const { db, collection, addDoc, doc, setDoc, appId } = window.FB;
                 const defaultLists = [
                     {
                         title: "Apertura Barra Principal", category: "Apertura", area: "Barra Principal", type: "standard",
@@ -365,8 +366,23 @@
                             "dry martini",
                             "long island ice tea",
                             "Margarita clasica",
-                            "Margarita spicy"
                         ]
+                    },
+                    {
+                        title: "Inventario de Premixes", category: "Inventario", area: "Barra Principal", type: "inventory", unit: "Bolsa 700ml",
+                        tasks: LAB_PREMIXES
+                    },
+                    {
+                        title: "Inventario de Destilados", category: "Inventario", area: "Barra Principal", type: "inventory", unit: "Botella",
+                        tasks: BOTELLAS_STOCK
+                    },
+                    {
+                        title: "Inventario de Premixes", category: "Inventario", area: "Barra Secundaria", type: "inventory", unit: "Bolsa 700ml",
+                        tasks: LAB_PREMIXES
+                    },
+                    {
+                        title: "Inventario de Destilados", category: "Inventario", area: "Barra Secundaria", type: "inventory", unit: "Botella",
+                        tasks: BOTELLAS_STOCK
                     },
                     {
                         title: "Cierre Lab Fenómeno", category: "Cierre", area: "Laboratorio", type: "standard",
@@ -385,6 +401,28 @@
                         type: list.type || 'standard'
                     });
                 }
+
+                const qConfig = collection(db, 'artifacts', appId, 'public', 'data', 'config');
+                await setDoc(doc(qConfig, 'weeklySchedule'), {
+                    text: `LIAN: x / 16-00 / 17-01 / 20-04 / 20-04 / 17-01 / x\n` +
+                        `DILAN: 18-02 / x / x / 17-01 / 17-01 / 18-02 / 18-02\n` +
+                        `DANIEL: 17-01 / 16-00 / x / x / 16-00 / 17-01 / 16-02\n` +
+                        `ANTON: 19-03 / 19-03 / x / 20-04 / 20-04 / x / 19-03\n` +
+                        `MARIO: 17-01 / 17-01 / x / x / 17-01 / x / 17-01\n` +
+                        `GABRI: x / x / 19-03 / 19-03 / 20-04 / 20-04 / 19-03\n` +
+                        `LAURA: 19-03 / x / 19-03 / 19-03 / 19-03 / 19-03 / x\n` +
+                        `DIANET: x / x / 19-03 / 19-03 / 19-03 / 19-03 / 19-03\n` +
+                        `LORENZO: x / 19-03 / 17-01 / 20-04 / 20-04 / 19-03 / x`
+                });
+
+                await setDoc(doc(qConfig, 'dailyLabPlan'), {
+                    selections: [
+                        { name: "Margarita spicy", qty: "2 bolsas 700ml" },
+                        { name: "Margarita clasica", qty: "2 bolsas 700ml" },
+                        { name: "long island ice tea", qty: "2 bolsas 700ml" }
+                    ],
+                    updatedAt: Date.now()
+                });
             };
 
             if (loading) return (
@@ -419,7 +457,7 @@
                             activeChecklist ? (
                                 <ChecklistForm checklist={activeChecklist} onCancel={() => setActiveChecklist(null)} />
                             ) : (
-                                <UserDashboard checklists={checklists} onSelect={setActiveChecklist} />
+                                <UserDashboard checklists={checklists} onSelect={setActiveChecklist} activeTab={userActiveTab} setActiveTab={setUserActiveTab} />
                             )
                         ) : view === 'pin' ? (
                             <PinEntry onSuccess={() => { setIsAdminAuthenticated(true); setView('admin'); }} onCancel={() => setView('user')} />
@@ -446,16 +484,30 @@
             "mai tai", "dry martini", "long island ice tea", "Margarita clasica", "Margarita spicy"
         ];
 
+        const BOTELLAS_STOCK = [
+            "BACARDI", "ST TERESA 1796", "DIPLOMATICO", "PLANTERAY 3 STARS",
+            "1800 SILVER", "1800 CRISTALINO", "PATRON SILVER", "PATRON CRISTALINO",
+            "MAESTRO DOBEL DIAMANTE", "DEOBEL 50", "DJ 1942",
+            "JW BLACK LABEL", "JW GOLD LABEL", "JW BLUE LABEL",
+            "HIBIKI", "YAMASAKI", "WOODFORD RESERVE",
+            "GLENFIDICH 12", "GLENFIDICH 15", "LAGAVULLING 16", "LAPHROAIG 10",
+            "BOMBAY SAPHIRE", "BOMBAY PRESSE", "BOMBAY PREMIER CRU",
+            "TANQUERAY", "TANQUERAY TEN", "GINMARE", "SIPSMITH", "SEAGRAMS"
+        ];
+
         // --- COMPONENTES DE USUARIO ---
 
-        function UserDashboard({ checklists, onSelect }) {
-            const [activeArea, setActiveArea] = useState('Barra Principal');
+        function UserDashboard({ checklists, onSelect, activeTab, setActiveTab }) {
             const [smartInventoryData, setSmartInventoryData] = useState(null);
 
             const [weeklySchedule, setWeeklySchedule] = useState('');
             const [dailyLabPlan, setDailyLabPlan] = useState([]);
 
             const [isLabModalOpen, setIsLabModalOpen] = useState(false);
+            const [isScheduleExpanded, setIsScheduleExpanded] = useState(false);
+            const [labSubTab, setLabSubTab] = useState('tareas');
+            const [barraPrincipalSubTab, setBarraPrincipalSubTab] = useState('checklists');
+            const [barraSecundariaSubTab, setBarraSecundariaSubTab] = useState('checklists');
 
             const parseScheduleToTable = (text) => {
                 if (!text) return null;
@@ -550,127 +602,189 @@
 
 
             const areaChecklists = checklists
-                .filter(c => (c.area || 'Barra Principal') === activeArea)
+                .filter(c => (c.area || 'Barra Principal') === activeTab)
                 .sort((a, b) => {
                     const order = { 'Apertura': 1, 'Producción': 2, 'Inventario': 3, 'Cierre': 4 };
                     return (order[a.category] || 9) - (order[b.category] || 9);
                 });
 
+            const filteredAreaChecklists = areaChecklists.filter(c => {
+                if (activeTab === 'Laboratorio') {
+                    if (labSubTab === 'tareas') return c.category === 'Producción' && c.title.startsWith('Producción Lab');
+                    if (labSubTab === 'checklists') return (c.category !== 'Producción' || !c.title.startsWith('Producción Lab')) && c.type !== 'inventory' && c.type !== 'shrinkage';
+                    if (labSubTab === 'inventarios') return c.type === 'inventory';
+                } else if (activeTab === 'Barra Principal') {
+                    if (barraPrincipalSubTab === 'checklists') return c.type !== 'inventory' && c.type !== 'shrinkage';
+                    if (barraPrincipalSubTab === 'inventarios') return c.type === 'inventory';
+                    if (barraPrincipalSubTab === 'mermas') return false; // Handled separately
+                } else if (activeTab === 'Barra Secundaria') {
+                    if (barraSecundariaSubTab === 'checklists') return c.type !== 'inventory' && c.type !== 'shrinkage';
+                    if (barraSecundariaSubTab === 'inventarios') return c.type === 'inventory';
+                    if (barraSecundariaSubTab === 'mermas') return false; // Handled separately
+                }
+                return true;
+            });
+
             return (
                 <div className="space-y-8 mt-4 animate-in">
-                    <header>
+                    <header className="mb-8">
                         <h2 className="text-4xl font-black uppercase tracking-tighter leading-none text-white tracking-widest animate-in">Operativa<br /><span className="text-amber-500 italic">FENÓMENO</span></h2>
                     </header>
 
-                    {(weeklySchedule || dailyLabPlan) && (
-                        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
-                            {weeklySchedule && (
-                                <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden xl:col-span-3">
-                                    <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl"></div>
-                                    <h3 className="text-amber-500 font-black uppercase tracking-widest text-xs flex items-center gap-2 mb-1"><Icon name="calendar-days" size={16} /> Horario Semanal</h3>
-                                    {parseScheduleToTable(weeklySchedule)}
+                    <div className="flex gap-10 border-b border-zinc-800 mb-8 overflow-x-auto scrollbar-hide no-print">
+                        <button onClick={() => setActiveTab('resumen')} className={`pb-4 px-1 text-xs font-black uppercase tracking-widest relative whitespace-nowrap transition-all ${activeTab === 'resumen' ? 'text-white' : 'text-zinc-600'}`}><span>Resumen</span> {activeTab === 'resumen' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 rounded-full shadow-[0_0_10px_#f59e0b]"></div>}</button>
+                        <button onClick={() => { setActiveTab('Barra Principal'); setBarraPrincipalSubTab('checklists'); }} className={`pb-4 px-1 text-xs font-black uppercase tracking-widest relative whitespace-nowrap transition-all ${activeTab === 'Barra Principal' ? 'text-white' : 'text-zinc-600'}`}><span>Barra Principal</span> {activeTab === 'Barra Principal' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 rounded-full shadow-[0_0_10px_#f59e0b]"></div>}</button>
+                        <button onClick={() => { setActiveTab('Barra Secundaria'); setBarraSecundariaSubTab('checklists'); }} className={`pb-4 px-1 text-xs font-black uppercase tracking-widest relative whitespace-nowrap transition-all ${activeTab === 'Barra Secundaria' ? 'text-white' : 'text-zinc-600'}`}><span>Barra Secundaria</span> {activeTab === 'Barra Secundaria' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 rounded-full shadow-[0_0_10px_#f59e0b]"></div>}</button>
+                        <button onClick={() => { setActiveTab('Laboratorio'); setLabSubTab('tareas'); }} className={`pb-4 px-1 text-xs font-black uppercase tracking-widest relative whitespace-nowrap transition-all ${activeTab === 'Laboratorio' ? 'text-white' : 'text-zinc-600'}`}><span>Laboratorio</span> {activeTab === 'Laboratorio' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500 rounded-full shadow-[0_0_10px_#f59e0b]"></div>}</button>
+                    </div>
+
+                    {activeTab === 'resumen' ? (
+                        <div key="tab-resumen" className="space-y-8 animate-in mt-4">
+                            {(weeklySchedule || dailyLabPlan) && (
+                                <div className="grid grid-cols-1 xl:grid-cols-5 gap-4">
+                                    {weeklySchedule && (
+                                        <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden xl:col-span-3">
+                                            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl"></div>
+                                            <div className="flex items-center justify-between mb-4 cursor-pointer group" onClick={() => setIsScheduleExpanded(!isScheduleExpanded)}>
+                                                <h3 className="text-amber-500 font-black uppercase tracking-widest text-xs flex items-center gap-2"><Icon name="calendar-days" size={16} /> Horario Semanal</h3>
+                                                <div className="w-8 h-8 rounded-full bg-zinc-950/50 border border-zinc-800 flex items-center justify-center group-hover:border-amber-500/30 transition-all text-zinc-500">
+                                                    <Icon name={isScheduleExpanded ? 'chevron-up' : 'chevron-down'} size={14} />
+                                                </div>
+                                            </div>
+                                            <div className={`transition-all duration-300 overflow-hidden ${isScheduleExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                                                {parseScheduleToTable(weeklySchedule)}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {dailyLabPlan && dailyLabPlan.length > 0 && (
+                                        <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden xl:col-span-2 flex flex-col group">
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl transition-all group-hover:bg-amber-500/10"></div>
+                                            <div className="mb-4">
+                                                <h3 className="text-amber-500 font-black uppercase tracking-widest text-xs flex items-center gap-2 mb-2"><Icon name="test-tubes" size={16} /> Planificador Lab</h3>
+                                            </div>
+                                            <div className="space-y-2 overflow-y-auto max-h-[220px] scrollbar-hide mb-4 relative z-10 w-full pl-1">
+                                                {dailyLabPlan.filter(p => LAB_PREMIXES.includes(p.name)).concat(dailyLabPlan.filter(p => LAB_PREPS.includes(p.name))).map(item => (
+                                                    <div key={`card-${item.name}`} className="flex flex-col p-3 rounded-xl bg-zinc-950/50 border border-zinc-800/50 hover:border-amber-500/30 transition-all w-full group">
+                                                        <div className="flex items-center">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-3 shadow-[0_0_8px_#f59e0b] shrink-0"></div>
+                                                            <span className="font-bold uppercase tracking-widest text-[10px] text-zinc-300 group-hover:text-white transition-colors flex-1">{item.name}</span>
+                                                        </div>
+                                                        {item.qty && <span className="ml-4 mt-2 text-[10px] text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20 self-start font-black">{item.qty}</span>}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <button onClick={() => setIsLabModalOpen(true)} className="w-full bg-zinc-800 text-zinc-400 font-black uppercase tracking-widest py-3 rounded-xl hover:bg-zinc-700 hover:text-white transition-colors text-[10px] shadow-lg mt-auto flex items-center justify-center gap-2 relative z-10 shrink-0">
+                                                <Icon name="maximize-2" size={14} /> Expandir Vista Lab
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                            {dailyLabPlan && dailyLabPlan.length > 0 && (
-                                <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden xl:col-span-2 flex flex-col group">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl transition-all group-hover:bg-amber-500/10"></div>
-                                    <div className="mb-4">
-                                        <h3 className="text-amber-500 font-black uppercase tracking-widest text-xs flex items-center gap-2 mb-2"><Icon name="test-tubes" size={16} /> Planificador Lab</h3>
+
+                            {smartInventoryData && smartInventoryData.length > 0 && (
+                                <div className="bg-gradient-to-br from-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Icon name="clipboard-check" className="text-zinc-500" size={18} />
+                                        <h3 className="text-zinc-500 font-black uppercase tracking-widest text-xs">Inventarios Activos (Últimas 24h)</h3>
                                     </div>
-                                    <div className="space-y-2 overflow-y-auto max-h-[220px] scrollbar-hide mb-4 relative z-10 w-full pl-1">
-                                        {dailyLabPlan.filter(p => LAB_PREMIXES.includes(p.name)).concat(dailyLabPlan.filter(p => LAB_PREPS.includes(p.name))).map(item => (
-                                            <div key={`card-${item.name}`} className="flex flex-col p-3 rounded-xl bg-zinc-950/50 border border-zinc-800/50 hover:border-amber-500/30 transition-all w-full group">
-                                                <div className="flex items-center">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-3 shadow-[0_0_8px_#f59e0b] shrink-0"></div>
-                                                    <span className="font-bold uppercase tracking-widest text-[10px] text-zinc-300 group-hover:text-white transition-colors flex-1">{item.name}</span>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide pb-2">
+                                        {smartInventoryData.map((invData, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setSmartInventoryData(prev => prev.map((item, id) => id === idx ? { ...item, _expanded: !item._expanded } : item))}
+                                                className="w-full text-left bg-zinc-950 p-5 rounded-3xl border border-zinc-800 hover:border-amber-500/30 transition-all flex flex-col justify-start relative cursor-pointer group/card h-fit"
+                                            >
+                                                <div className="flex justify-between items-center w-full">
+                                                    <div>
+                                                        <p className="text-white font-black text-sm tracking-tight uppercase group-hover/card:text-amber-500 transition-colors">{invData.checklistTitle}</p>
+                                                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-0.5">{new Date(invData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                                    </div>
+                                                    <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/card:border-amber-500/30 transition-all shadow-lg shrink-0">
+                                                        <Icon name={invData._expanded ? "chevron-up" : "chevron-down"} size={16} className={`${invData._expanded ? "text-amber-500" : "text-zinc-500"} transition-all`} />
+                                                    </div>
                                                 </div>
-                                                {item.qty && <span className="ml-4 mt-2 text-[10px] text-amber-500 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20 self-start font-black">{item.qty}</span>}
-                                            </div>
+
+                                                {invData._expanded && (
+                                                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-zinc-800/50 w-full animate-in fade-in slide-in-from-top-2 duration-200">
+                                                        {invData.tasks.map((t, i) => {
+                                                            const val = invData.inventoryValues?.[i] || 0;
+                                                            if (val === 0 || val === "0") return null;
+                                                            return (
+                                                                <span key={i} className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 font-black px-2 py-1.5 rounded-lg uppercase flex items-center shadow-sm">
+                                                                    {t.split('(')[0].trim()} <span className="ml-2 text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20">{val}</span>
+                                                                </span>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </button>
                                         ))}
                                     </div>
-                                    <button onClick={() => setIsLabModalOpen(true)} className="w-full bg-zinc-800 text-zinc-400 font-black uppercase tracking-widest py-3 rounded-xl hover:bg-zinc-700 hover:text-white transition-colors text-[10px] shadow-lg mt-auto flex items-center justify-center gap-2 relative z-10 shrink-0">
-                                        <Icon name="maximize-2" size={14} /> Expandir Vista Lab
-                                    </button>
                                 </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-4 pb-4">
+                                <button onClick={() => setActiveTab('Barra Principal')} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-amber-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
+                                    <div className="w-12 h-12 rounded-full bg-zinc-950 flex items-center justify-center shadow-inner group-hover:text-amber-500 transition-colors"><Icon name="list-checks" size={20} /></div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-center">Ir a Checklists</span>
+                                </button>
+                                <button onClick={() => setActiveTab('Mermas')} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-red-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
+                                    <div className="w-12 h-12 rounded-full bg-zinc-950 flex items-center justify-center shadow-inner group-hover:text-red-500 transition-colors"><Icon name="alert-triangle" size={20} /></div>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-center">Reportar Merma</span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div key="tab-checklists" className="grid gap-3 animate-in mt-4">
+                            {activeTab === 'Laboratorio' && (
+                                <div className="flex gap-2 p-1.5 bg-zinc-900 border border-zinc-800 rounded-2xl mb-4 overflow-x-auto scrollbar-hide no-print">
+                                    <button onClick={() => setLabSubTab('tareas')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'tareas' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="clipboard-check" size={14} /> Tareas de Hoy</button>
+                                    <button onClick={() => setLabSubTab('checklists')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'checklists' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="list-checks" size={14} /> Checklists</button>
+                                    <button onClick={() => setLabSubTab('inventarios')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'inventarios' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="boxes" size={14} /> Inventarios</button>
+                                </div>
+                            )}
+                            {activeTab === 'Barra Principal' && (
+                                <div className="flex gap-2 p-1.5 bg-zinc-900 border border-zinc-800 rounded-2xl mb-4 overflow-x-auto scrollbar-hide no-print">
+                                    <button onClick={() => setBarraPrincipalSubTab('checklists')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraPrincipalSubTab === 'checklists' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="list-checks" size={14} /> Checklists</button>
+                                    <button onClick={() => setBarraPrincipalSubTab('inventarios')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraPrincipalSubTab === 'inventarios' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="clipboard-list" size={14} /> Inventarios</button>
+                                    <button onClick={() => setBarraPrincipalSubTab('mermas')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraPrincipalSubTab === 'mermas' ? 'bg-red-500 text-white shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="alert-triangle" size={14} /> Mermas</button>
+                                </div>
+                            )}
+                            {activeTab === 'Barra Secundaria' && (
+                                <div className="flex gap-2 p-1.5 bg-zinc-900 border border-zinc-800 rounded-2xl mb-4 overflow-x-auto scrollbar-hide no-print">
+                                    <button onClick={() => setBarraSecundariaSubTab('checklists')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraSecundariaSubTab === 'checklists' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="list-checks" size={14} /> Checklists</button>
+                                    <button onClick={() => setBarraSecundariaSubTab('inventarios')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraSecundariaSubTab === 'inventarios' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="clipboard-list" size={14} /> Inventarios</button>
+                                    <button onClick={() => setBarraSecundariaSubTab('mermas')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${barraSecundariaSubTab === 'mermas' ? 'bg-red-500 text-white shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="alert-triangle" size={14} /> Mermas</button>
+                                </div>
+                            )}
+
+                            {((activeTab === 'Barra Principal' && barraPrincipalSubTab === 'mermas') || (activeTab === 'Barra Secundaria' && barraSecundariaSubTab === 'mermas')) ? (
+                                <div className="animate-in mt-4">
+                                    <ChecklistForm
+                                        checklist={{ id: `mermas-${activeTab}`, title: `Reporte de Mermas (${activeTab})`, type: 'shrinkage', category: 'Inventario', area: activeTab }}
+                                        onCancel={() => activeTab === 'Barra Principal' ? setBarraPrincipalSubTab('checklists') : setBarraSecundariaSubTab('checklists')}
+                                    />
+                                </div>
+                            ) : filteredAreaChecklists.length === 0 ? (
+                                <div className="p-8 text-center border-2 border-dashed border-zinc-800 rounded-3xl text-zinc-600 font-bold uppercase tracking-widest text-xs">Aún no hay listas en esta área</div>
+                            ) : (
+                                filteredAreaChecklists.map(item => (
+                                    <button key={item.id} onClick={() => onSelect(item)} className="w-full flex items-center justify-between p-6 bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] active:scale-95 transition-all group hover:border-amber-500/30">
+                                        <div className="flex items-center gap-5 text-left">
+                                            <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-amber-500 group-hover:text-zinc-950 transition-all duration-300">
+                                                <Icon name={item.category === 'Apertura' ? 'sun' : item.category === 'Cierre' ? 'moon' : item.type === 'inventory' ? 'clipboard-list' : 'beaker'} size={24} />
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-lg uppercase tracking-tight leading-tight text-white">{item.title}</p>
+                                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mt-1 italic">{item.type === 'inventory' ? 'Inventario' : 'Checklist'} ({item.category}) • {item.tasks.length} {item.type === 'inventory' ? 'Ítems' : 'Tareas'}</p>
+                                            </div>
+                                        </div>
+                                        <Icon name="chevron-right" className="text-zinc-700" />
+                                    </button>
+                                ))
                             )}
                         </div>
                     )}
-
-                    {smartInventoryData && smartInventoryData.length > 0 && (
-                        <div className="bg-gradient-to-br from-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl relative overflow-hidden group">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Icon name="clipboard-check" className="text-zinc-500" size={18} />
-                                <h3 className="text-zinc-500 font-black uppercase tracking-widest text-xs">Inventarios Activos (Últimas 24h)</h3>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide pb-2">
-                                {smartInventoryData.map((invData, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setSmartInventoryData(prev => prev.map((item, id) => id === idx ? { ...item, _expanded: !item._expanded } : item))}
-                                        className="w-full text-left bg-zinc-950 p-5 rounded-3xl border border-zinc-800 hover:border-amber-500/30 transition-all flex flex-col justify-start relative cursor-pointer group/card h-fit"
-                                    >
-                                        <div className="flex justify-between items-center w-full">
-                                            <div>
-                                                <p className="text-white font-black text-sm tracking-tight uppercase group-hover/card:text-amber-500 transition-colors">{invData.checklistTitle}</p>
-                                                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-0.5">{new Date(invData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                            </div>
-                                            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/card:border-amber-500/30 transition-all shadow-lg shrink-0">
-                                                <Icon name={invData._expanded ? "chevron-up" : "chevron-down"} size={16} className={`${invData._expanded ? "text-amber-500" : "text-zinc-500"} transition-all`} />
-                                            </div>
-                                        </div>
-
-                                        {invData._expanded && (
-                                            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-zinc-800/50 w-full animate-in fade-in slide-in-from-top-2 duration-200">
-                                                {invData.tasks.map((t, i) => {
-                                                    const val = invData.inventoryValues?.[i] || 0;
-                                                    if (val === 0 || val === "0") return null;
-                                                    return (
-                                                        <span key={i} className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 font-black px-2 py-1.5 rounded-lg uppercase flex items-center shadow-sm">
-                                                            {t.split('(')[0].trim()} <span className="ml-2 text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded-md border border-amber-500/20">{val}</span>
-                                                        </span>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="flex gap-2 p-1 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-x-auto scrollbar-hide">
-                        {['Barra Principal', 'Barra Secundaria', 'Laboratorio'].map(area => (
-                            <button
-                                key={area}
-                                onClick={() => setActiveArea(area)}
-                                className={`flex-shrink-0 px-4 py-3 rounded-xl text-[10px] font-black tracking-widest transition-all ${activeArea === area ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-zinc-300'}`}
-                            >
-                                {area.toUpperCase()}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="grid gap-3">
-                        {areaChecklists.length === 0 ? (
-                            <div className="p-8 text-center border-2 border-dashed border-zinc-800 rounded-3xl text-zinc-600 font-bold uppercase tracking-widest text-xs">Aún no hay listas en esta área</div>
-                        ) : (
-                            areaChecklists.map(item => (
-                                <button key={item.id} onClick={() => onSelect(item)} className="w-full flex items-center justify-between p-6 bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] active:scale-95 transition-all group hover:border-amber-500/30">
-                                    <div className="flex items-center gap-5 text-left">
-                                        <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-amber-500 group-hover:text-zinc-950 transition-all duration-300">
-                                            <Icon name={item.category === 'Apertura' ? 'sun' : item.category === 'Cierre' ? 'moon' : item.type === 'inventory' ? 'clipboard-list' : 'beaker'} size={24} />
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-lg uppercase tracking-tight leading-tight text-white">{item.title}</p>
-                                            <p className="text-zinc-600 text-[10px] font-black uppercase tracking-widest mt-1 italic">{item.type === 'inventory' ? 'Inventario' : 'Checklist'} ({item.category}) • {item.tasks.length} {item.type === 'inventory' ? 'Ítems' : 'Tareas'}</p>
-                                        </div>
-                                    </div>
-                                    <Icon name="chevron-right" className="text-zinc-700" />
-                                </button>
-                            ))
-                        )}
-                    </div>
-
                     {isLabModalOpen && (
                         <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 overflow-y-auto w-full h-full animate-in fade-in flex flex-col">
                             <div className="sticky top-0 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800 p-4 sm:p-6 flex items-center justify-between z-10 shadow-2xl">
@@ -733,13 +847,14 @@
                     )}
                 </div>
             );
-        }
+        };
 
         function ChecklistForm({ checklist, onCancel }) {
             const [completed, setCompleted] = useState([]);
             const [inventoryValues, setInventoryValues] = useState({});
             const [shrinkageRecords, setShrinkageRecords] = useState([]);
             const [newShrinkage, setNewShrinkage] = useState({ product: '', qty: '', unit: 'Lt', reason: 'Error de preparación', disposal: 'Desechado' });
+            const [shrinkageArea, setShrinkageArea] = useState(checklist.area || 'Barra Principal');
             const [bartender, setBartender] = useState('');
             const [notes, setNotes] = useState('');
             const [isSubmitting, setIsSubmitting] = useState(false);
@@ -781,7 +896,7 @@
                         checklistId: checklist.id,
                         checklistTitle: checklist.title,
                         checklistType: checklist.type || 'standard',
-                        area: checklist.area || 'General',
+                        area: isShrinkage ? shrinkageArea : (checklist.area || 'General'),
                         category: checklist.category || 'Otros',
                         bartender,
                         notes,
@@ -810,7 +925,7 @@
                         <p className="text-[#888888] text-[10px] font-black uppercase tracking-[0.2em] relative z-10 flex items-center gap-2">
                             <span>{checklist.category}</span>
                             <span className="w-1 h-1 rounded-full bg-amber-500"></span>
-                            <span>{checklist.area || 'Barra Principal'}</span>
+                            <span>{isShrinkage ? shrinkageArea : (checklist.area || 'Barra Principal')}</span>
                         </p>
                     </div>
 
@@ -823,7 +938,16 @@
                     <div className="space-y-3">
                         {isShrinkage ? (
                             <div className="bg-zinc-900/50 border-2 border-zinc-800 rounded-[2.5rem] p-6 space-y-6">
-                                <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Añadir Nuevo Registro de Merma</p>
+                                <div className="space-y-3">
+                                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">¿En qué zona ocurrió?</p>
+                                    <div className="flex flex-col md:flex-row gap-2">
+                                        <button onClick={() => setShrinkageArea('Barra Principal')} className={`flex-1 py-3 px-2 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all ${shrinkageArea === 'Barra Principal' ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-lg' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-amber-500/30 hover:text-white'}`}>Barra Principal</button>
+                                        <button onClick={() => setShrinkageArea('Barra Secundaria')} className={`flex-1 py-3 px-2 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all ${shrinkageArea === 'Barra Secundaria' ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-lg' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-amber-500/30 hover:text-white'}`}>Barra Sec.</button>
+                                        <button onClick={() => setShrinkageArea('Laboratorio')} className={`flex-1 py-3 px-2 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all ${shrinkageArea === 'Laboratorio' ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-lg' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-amber-500/30 hover:text-white'}`}>Laboratorio</button>
+                                    </div>
+                                </div>
+                                <div className="h-px w-full bg-zinc-800/50"></div>
+                                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Añadir Nuevo Registro de Merma</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <input
                                         type="text" placeholder="Producto / Ingrediente" value={newShrinkage.product} onChange={e => setNewShrinkage({ ...newShrinkage, product: e.target.value })}
@@ -1207,7 +1331,7 @@
                                                         <h4 className="font-black text-amber-800 uppercase tracking-widest text-[10px] mb-3">PLAN DE PRODUCCIÓN SUGERIDO (MANAGER)</h4>
                                                         <div className="flex flex-wrap gap-2">
                                                             {dailyLabPlan.map(item => (
-                                                                <span key={item} className="bg-white border border-amber-300 text-black px-2 py-1 rounded-md text-[9px] font-bold uppercase">{item}</span>
+                                                                <span key={item.name} className="bg-white border border-amber-300 text-black px-2 py-1 rounded-md text-[9px] font-bold uppercase">{item.name}{item.qty ? ` - ${item.qty}` : ''}</span>
                                                             ))}
                                                         </div>
                                                     </div>
@@ -1354,7 +1478,7 @@
                                                         <div key={`admin-premix-${item}`} className={`flex flex-col p-3 rounded-xl transition-all ${isSelected ? 'bg-amber-500/10 border border-amber-500/30 shadow-sm' : 'bg-zinc-900 border border-zinc-800 hover:bg-zinc-800'}`}>
                                                             <label className="flex items-center gap-3 cursor-pointer">
                                                                 <input type="checkbox" className="hidden" checked={isSelected} onChange={(e) => {
-                                                                    if (e.target.checked) setDailyLabPlan([...dailyLabPlan, { name: item, qty: '' }]);
+                                                                    if (e.target.checked) setDailyLabPlan([...dailyLabPlan, { name: item, qty: '5 Bolsas 700ml' }]);
                                                                     else setDailyLabPlan(dailyLabPlan.filter(i => i.name !== item));
                                                                 }} />
                                                                 <Icon name={isSelected ? "check-square" : "square"} size={16} className={isSelected ? "text-amber-500" : "text-zinc-600"} />
@@ -1384,7 +1508,7 @@
                                                         <div key={`admin-prep-${item}`} className={`flex flex-col p-3 rounded-xl transition-all ${isSelected ? 'bg-amber-500/10 border border-amber-500/30 shadow-sm' : 'bg-zinc-900 border border-zinc-800 hover:bg-zinc-800'}`}>
                                                             <label className="flex items-center gap-3 cursor-pointer">
                                                                 <input type="checkbox" className="hidden" checked={isSelected} onChange={(e) => {
-                                                                    if (e.target.checked) setDailyLabPlan([...dailyLabPlan, { name: item, qty: '' }]);
+                                                                    if (e.target.checked) setDailyLabPlan([...dailyLabPlan, { name: item, qty: '2 Litros' }]);
                                                                     else setDailyLabPlan(dailyLabPlan.filter(i => i.name !== item));
                                                                 }} />
                                                                 <Icon name={isSelected ? "check-square" : "square"} size={16} className={isSelected ? "text-amber-500" : "text-zinc-600"} />
