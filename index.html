@@ -613,6 +613,7 @@
                     if (labSubTab === 'tareas') return c.category === 'Producción' && c.title.startsWith('Producción Lab');
                     if (labSubTab === 'checklists') return (c.category !== 'Producción' || !c.title.startsWith('Producción Lab')) && c.type !== 'inventory' && c.type !== 'shrinkage';
                     if (labSubTab === 'inventarios') return c.type === 'inventory';
+                    if (labSubTab === 'mermas') return false; // Handled separately
                 } else if (activeTab === 'Barra Principal') {
                     if (barraPrincipalSubTab === 'checklists') return c.type !== 'inventory' && c.type !== 'shrinkage';
                     if (barraPrincipalSubTab === 'inventarios') return c.type === 'inventory';
@@ -724,11 +725,11 @@
                             )}
 
                             <div className="grid grid-cols-2 gap-4 pb-4">
-                                <button onClick={() => setActiveTab('Barra Principal')} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-amber-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
+                                <button onClick={() => { setActiveTab('Barra Principal'); setBarraPrincipalSubTab('checklists'); }} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-amber-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
                                     <div className="w-12 h-12 rounded-full bg-zinc-950 flex items-center justify-center shadow-inner group-hover:text-amber-500 transition-colors"><Icon name="list-checks" size={20} /></div>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-center">Ir a Checklists</span>
                                 </button>
-                                <button onClick={() => setActiveTab('Mermas')} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-red-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
+                                <button onClick={() => { setActiveTab('Barra Principal'); setBarraPrincipalSubTab('mermas'); }} className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-5 shadow-xl flex flex-col items-center justify-center gap-3 hover:border-red-500/50 hover:bg-zinc-800 transition-all text-zinc-400 hover:text-white group">
                                     <div className="w-12 h-12 rounded-full bg-zinc-950 flex items-center justify-center shadow-inner group-hover:text-red-500 transition-colors"><Icon name="alert-triangle" size={20} /></div>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-center">Reportar Merma</span>
                                 </button>
@@ -741,6 +742,7 @@
                                     <button onClick={() => setLabSubTab('tareas')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'tareas' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="clipboard-check" size={14} /> Tareas de Hoy</button>
                                     <button onClick={() => setLabSubTab('checklists')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'checklists' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="list-checks" size={14} /> Checklists</button>
                                     <button onClick={() => setLabSubTab('inventarios')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'inventarios' ? 'bg-amber-500 text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="boxes" size={14} /> Inventarios</button>
+                                    <button onClick={() => setLabSubTab('mermas')} className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center justify-center gap-2 ${labSubTab === 'mermas' ? 'bg-red-500 text-white shadow-lg' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'}`}><Icon name="alert-triangle" size={14} /> Mermas</button>
                                 </div>
                             )}
                             {activeTab === 'Barra Principal' && (
@@ -758,11 +760,11 @@
                                 </div>
                             )}
 
-                            {((activeTab === 'Barra Principal' && barraPrincipalSubTab === 'mermas') || (activeTab === 'Barra Secundaria' && barraSecundariaSubTab === 'mermas')) ? (
+                            {((activeTab === 'Barra Principal' && barraPrincipalSubTab === 'mermas') || (activeTab === 'Barra Secundaria' && barraSecundariaSubTab === 'mermas') || (activeTab === 'Laboratorio' && labSubTab === 'mermas')) ? (
                                 <div className="animate-in mt-4">
                                     <ChecklistForm
-                                        checklist={{ id: `mermas-${activeTab}`, title: `Reporte de Mermas (${activeTab})`, type: 'shrinkage', category: 'Inventario', area: activeTab }}
-                                        onCancel={() => activeTab === 'Barra Principal' ? setBarraPrincipalSubTab('checklists') : setBarraSecundariaSubTab('checklists')}
+                                        checklist={{ id: `mermas-${activeTab}`, title: `Reporte de Mermas (${activeTab})`, type: 'shrinkage', category: 'Inventario', area: activeTab, tasks: [] }}
+                                        onCancel={() => activeTab === 'Barra Principal' ? setBarraPrincipalSubTab('checklists') : activeTab === 'Barra Secundaria' ? setBarraSecundariaSubTab('checklists') : setLabSubTab('tareas')}
                                     />
                                 </div>
                             ) : filteredAreaChecklists.length === 0 ? (
@@ -893,17 +895,17 @@
                 setIsSubmitting(true);
                 try {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'submissions'), {
-                        checklistId: checklist.id,
-                        checklistTitle: checklist.title,
+                        checklistId: checklist.id || 'unknown',
+                        checklistTitle: checklist.title || 'Checklist',
                         checklistType: checklist.type || 'standard',
                         area: isShrinkage ? shrinkageArea : (checklist.area || 'General'),
                         category: checklist.category || 'Otros',
-                        bartender,
-                        notes,
-                        completedIndices: completed,
-                        inventoryValues: inventoryValues,
-                        shrinkageRecords: shrinkageRecords,
-                        tasks: checklist.tasks,
+                        bartender: bartender || '',
+                        notes: notes || '',
+                        completedIndices: completed || [],
+                        inventoryValues: inventoryValues || {},
+                        shrinkageRecords: shrinkageRecords || [],
+                        tasks: checklist.tasks || [],
                         timestamp: Date.now()
                     });
                     onCancel();
@@ -1122,17 +1124,30 @@
                         window.FB.setDoc(docL, { selections: dailyLabPlan }, { merge: true })
                     ];
 
-                    const labTasks = dailyLabPlan.map(p => p.qty ? `${p.name} - ${p.qty}` : p.name);
-                    if (labTasks.length > 0) {
-                        const newChecklist = {
-                            title: `Producción Lab - ${new Date().toLocaleDateString()}`,
+                    const premixTasks = dailyLabPlan.filter(p => LAB_PREMIXES.includes(p.name)).map(p => p.qty ? `${p.name} - ${p.qty}` : p.name);
+                    const prepTasks = dailyLabPlan.filter(p => LAB_PREPS.includes(p.name)).map(p => p.qty ? `${p.name} - ${p.qty}` : p.name);
+                    const dateStr = new Date().toLocaleDateString();
+
+                    if (premixTasks.length > 0) {
+                        ops.push(window.FB.addDoc(window.FB.collection(window.FB.db, 'artifacts', window.FB.appId, 'public', 'data', 'checklists'), {
+                            title: `Producción Lab (Premixes) - ${dateStr}`,
                             category: "Producción",
                             area: "Laboratorio",
                             type: "standard",
-                            tasks: labTasks,
+                            tasks: premixTasks,
                             createdAt: Date.now()
-                        };
-                        ops.push(window.FB.addDoc(window.FB.collection(window.FB.db, 'artifacts', window.FB.appId, 'public', 'data', 'checklists'), newChecklist));
+                        }));
+                    }
+
+                    if (prepTasks.length > 0) {
+                        ops.push(window.FB.addDoc(window.FB.collection(window.FB.db, 'artifacts', window.FB.appId, 'public', 'data', 'checklists'), {
+                            title: `Producción Lab (Preps) - ${dateStr}`,
+                            category: "Producción",
+                            area: "Laboratorio",
+                            type: "standard",
+                            tasks: prepTasks,
+                            createdAt: Date.now() + 1
+                        }));
                     }
 
                     await Promise.all(ops);
