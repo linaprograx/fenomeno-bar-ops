@@ -6,6 +6,15 @@
     <meta name="google" content="notranslate">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FENÓMENO Bar Ops</title>
+
+    <!-- PWA Config -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icon.png">
+    <link rel="icon" href="./icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fenómeno">
+
     <!-- Bibliotecas vía CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
@@ -72,6 +81,18 @@
         }
 
         @media print {
+            * {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+
+            html,
+            body {
+                height: auto !important;
+                overflow: visible !important;
+            }
+
             body {
                 background: white !important;
                 color: black !important;
@@ -1213,7 +1234,7 @@
 
             return (
                 <div className="space-y-8 animate-in mt-4">
-                    <header className="flex items-center justify-between">
+                    <header className="flex items-center justify-between no-print">
                         <h2 className="text-4xl font-black uppercase tracking-tighter leading-none text-white tracking-widest italic">Manager<br /><span className="text-amber-500 not-italic">Dashboard</span></h2>
                         <button onClick={() => { setEditingList({ title: "", category: "Apertura", tasks: [""] }); setActiveTab('manage'); }} className="bg-amber-500 text-zinc-950 px-5 py-3 rounded-2xl flex items-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
                             <Icon name="plus" size={16} /> Crear
